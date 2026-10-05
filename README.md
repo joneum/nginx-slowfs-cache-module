@@ -38,6 +38,9 @@ from CentOS, both in 2015 against nginx 1.8.0.
 The old list of releases this section used to carry, 0.7 through 1.3,
 described a state of affairs that ended more than ten years ago.
 
+What is open at the repository this one was forked from, and where this
+fork stands on each of it, is in [UPSTREAM.md](UPSTREAM.md).
+
 
 Configuration notes
 ===================
