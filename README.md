@@ -22,8 +22,8 @@ Status
 In use again.  The module builds against nginx 1.22.0, 1.24.0, 1.26.3,
 1.28.0, 1.30.5 and 1.31.6, and on each of them a configuration that
 carries `slowfs_cache_path` is read, nginx starts and a file comes back
-through the cache.  That is checked on Linux and on FreeBSD in
-[continuous
+through the cache with its ETag on it.  That is checked on Linux and on
+FreeBSD in [continuous
 integration](https://github.com/joneum/nginx-slowfs-cache-module/actions).
 
 Between roughly nginx 1.7.12 and this fork the module could not be used
@@ -43,6 +43,12 @@ Configuration notes
 ===================
 `slowfs_cache_path` and `slowfs_temp_path` values should point to the same
 filesystem, otherwise files will be copied twice.
+
+The temporary area defaults to `slowfs_temp` below the nginx prefix,
+the way nginx places `client_body_temp` and `proxy_temp`.  Upstream
+used a bare `/tmp`, which shares its level directories with everything
+else on the machine; a stray file named `1` in `/tmp` was enough to
+make every copy into the cache fail.
 
 `ngx_slowfs_cache` currently doesn't work when AIO is enabled.
 
@@ -88,7 +94,7 @@ Sets cache area and its structure.
 slowfs_temp_path
 ----------------
 * **syntax**: `slowfs_temp_path path [level1] [level2] [level3]`
-* **default**: `/tmp 1 2`
+* **default**: `slowfs_temp 1 2`
 * **context**: `http`
   
 Sets temporary area where files are stored before they are moved to cache area.

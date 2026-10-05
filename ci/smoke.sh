@@ -9,6 +9,11 @@
 # function pushes onto an array it finds there.  Nobody noticed, because
 # nothing ever built and started this module.  That is what this guards.
 #
+# It also covers two things that were wrong for as long: the answer
+# lost its ETag as soon as the module was switched on, and the default
+# temporary area was a bare /tmp, whose level directories are shared
+# with the rest of the machine.
+#
 # usage: ci/smoke.sh <nginx binary>
 #
 # Set SMOKE_LOAD_MODULE to the path of ngx_http_slowfs_module.so to test
@@ -53,8 +58,8 @@ events { worker_connections 64; }
 http {
     access_log off;
 
+    # no slowfs_temp_path: the default has to land below the prefix
     slowfs_cache_path $WORK/cache levels=1:2 keys_zone=smoke:4m inactive=1h;
-    slowfs_temp_path  $WORK/cache/tmp;
 
     server {
         listen 127.0.0.1:$PORT;
@@ -67,6 +72,11 @@ http {
             slowfs_cache_valid 1h;
 
             add_header X-Cache-Status \$slowfs_cache_status;
+        }
+
+        # the same file without the cache, to compare the ETag against
+        location /plain/ {
+            alias $WORK/origin/;
         }
     }
 }
@@ -107,15 +117,48 @@ for n in 1 2 3; do
 done
 
 echo "--- something reached the cache ---"
-# the temporary directory sits inside the cache directory, so leave it
-# out by its full path; a pattern like */tmp/* would also match every
-# work tree that happens to live under /tmp
-cached=$(find "$WORK/cache" -type f ! -path "$WORK/cache/tmp/*" 2>/dev/null)
+cached=$(find "$WORK/cache" -type f 2>/dev/null)
 if [ -n "$cached" ]; then
 	echo "$cached" | sed 's/^/  /'
 else
 	echo "  nothing was written" >&2
 	fail=1
+fi
+
+echo "--- the temporary area is below the prefix, not in /tmp ---"
+if [ -d "$WORK/slowfs_temp" ]; then
+	echo "  $WORK/slowfs_temp"
+else
+	echo "  $WORK/slowfs_temp was never created" >&2
+	fail=1
+fi
+
+echo "--- the ETag survives the cache ---"
+etag_plain=$(curl -sI "http://127.0.0.1:$PORT/plain/file.txt" |
+	tr -d '\r' | sed -n 's/^[Ee][Tt][Aa][Gg]: //p')
+etag_cache=$(curl -sI "http://127.0.0.1:$PORT/file.txt" |
+	tr -d '\r' | sed -n 's/^[Ee][Tt][Aa][Gg]: //p')
+if [ -z "$etag_cache" ]; then
+	echo "  the cached answer carries no ETag" >&2
+	fail=1
+elif [ "$etag_plain" != "$etag_cache" ]; then
+	echo "  without the cache $etag_plain, through it $etag_cache" >&2
+	fail=1
+else
+	echo "  $etag_cache, the same one the static handler produces"
+fi
+
+echo "--- a conditional request is answered with 304 ---"
+if [ -n "$etag_cache" ]; then
+	code=$(curl -s -o /dev/null -w '%{http_code}' \
+		-H "If-None-Match: $etag_cache" \
+		"http://127.0.0.1:$PORT/file.txt") || code=000
+	if [ "$code" = 304 ]; then
+		echo "  304"
+	else
+		echo "  HTTP $code, expected 304" >&2
+		fail=1
+	fi
 fi
 
 echo "--- nginx is still running ---"

@@ -91,8 +91,15 @@ static void *ngx_http_slowfs_create_main_conf(ngx_conf_t *cf);
 
 ngx_module_t  ngx_http_slowfs_module;
 
+/*
+ * nginx keeps its own temporary areas under the prefix, as
+ * "client_body_temp" and "proxy_temp".  This module used a bare
+ * "/tmp", whose level directories are shared with everything else on
+ * the machine: an unrelated file named "1" in /tmp is enough to make
+ * every copy into the cache fail with "Not a directory".
+ */
 static ngx_path_init_t  ngx_http_slowfs_temp_path = {
-    ngx_string("/tmp"), { 1, 2, 0 }
+    ngx_string("slowfs_temp"), { 1, 2, 0 }
 };
 
 static ngx_command_t  ngx_http_slowfs_module_commands[] = {
@@ -594,6 +601,15 @@ skip_alloc:
     r->headers_out.status = NGX_HTTP_OK;
     r->headers_out.content_length_n = c->length - c->body_start;
     r->headers_out.last_modified_time = c->last_modified;
+
+    /*
+     * The static handler puts an ETag on a file it serves, and what
+     * comes out of the cache is that same file.  Without this the
+     * header vanishes as soon as the module is switched on.
+     */
+    if (ngx_http_set_etag(r) != NGX_OK) {
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
 
     if (ngx_http_set_content_type(r) != NGX_OK) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
