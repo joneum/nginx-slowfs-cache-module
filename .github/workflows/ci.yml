@@ -1,0 +1,161 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Monday morning, so a new nginx release that breaks the module
+    # shows up here and not in somebody's build
+    - cron: '41 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: nginx ${{ matrix.nginx }}
+    runs-on: ubuntu-latest
+    # the module was unusable for about ten years because nothing ever
+    # built it and started it; ci/smoke.sh does exactly that
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 1.22.0 is the oldest release the README promises, 1.31.5 the
+        # current mainline
+        nginx: ['1.22.0', '1.24.0', '1.26.3', '1.28.0', '1.31.5']
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libpcre2-dev zlib1g-dev libssl-dev
+
+      - name: Build nginx ${{ matrix.nginx }}
+        run: ci/build.sh '${{ matrix.nginx }}' "$HOME/nginx"
+
+      - name: Read a configuration and serve a file through the cache
+        run: ci/smoke.sh "$HOME/nginx/sbin/nginx"
+
+  suite:
+    name: test suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libpcre2-dev zlib1g-dev libssl-dev cpanminus
+
+      - name: Cache Test::Nginx
+        uses: actions/cache@v6
+        with:
+          path: ~/perl5
+          key: cpan-${{ runner.os }}-test-nginx
+
+      - name: Install Test::Nginx
+        run: |
+          cpanm --local-lib=~/perl5 --notest --quiet Test::Nginx
+          echo "PERL5LIB=$HOME/perl5/lib/perl5" >> "$GITHUB_ENV"
+
+      - name: Build nginx
+        run: ci/build.sh 1.31.5 "$HOME/nginx"
+
+      - name: Run the test suite
+        run: TEST_NGINX_BINARY="$HOME/nginx/sbin/nginx" prove -r t/
+
+  dynamic:
+    name: loadable module
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libpcre2-dev zlib1g-dev libssl-dev
+
+      - name: Build the module as a loadable object
+        run: ci/build.sh 1.31.5 "$HOME/nginx" dynamic
+
+      - name: Load it and serve a file through the cache
+        run: |
+          SMOKE_LOAD_MODULE="$HOME/nginx/modules/ngx_http_slowfs_module.so" \
+            ci/smoke.sh "$HOME/nginx/sbin/nginx"
+
+  freebsd:
+    name: FreeBSD
+    runs-on: ubuntu-latest
+    # every other job measures Linux, and the port this module is
+    # packaged in is a FreeBSD one
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build and run the suite in a FreeBSD virtual machine
+        uses: vmactions/freebsd-vm@v1.5.6
+        with:
+          release: '14'
+          prepare: |
+            pkg install -y git pcre2 curl p5-Test-Nginx
+          run: |
+            ci/build.sh 1.31.5 "$HOME/nginx"
+            ci/smoke.sh "$HOME/nginx/sbin/nginx"
+            # the job runs as root, and Test::Nginx then writes "user
+            # root;" into its configuration.  root has no group of that
+            # name here, it is in wheel
+            TEST_NGINX_WORKER_USER='root wheel' \
+              TEST_NGINX_BINARY="$HOME/nginx/sbin/nginx" prove -r t/
+
+  valgrind:
+    name: valgrind
+    runs-on: ubuntu-latest
+    # slow, and a pull request is already covered by the matrix above
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libpcre2-dev zlib1g-dev libssl-dev cpanminus valgrind
+
+      - name: Cache Test::Nginx
+        uses: actions/cache@v6
+        with:
+          path: ~/perl5
+          key: cpan-${{ runner.os }}-test-nginx
+
+      - name: Install Test::Nginx
+        run: |
+          cpanm --local-lib=~/perl5 --notest --quiet Test::Nginx
+          echo "PERL5LIB=$HOME/perl5/lib/perl5" >> "$GITHUB_ENV"
+
+      - name: Build nginx
+        run: ci/build.sh 1.31.5 "$HOME/nginx"
+
+      - name: Run the test suite under valgrind
+        run: |
+          set -o pipefail
+          TEST_NGINX_USE_VALGRIND=1 TEST_NGINX_BINARY="$HOME/nginx/sbin/nginx" \
+            prove -r t/ 2>&1 | tee valgrind.log
+
+      - name: No findings allowed
+        run: |
+          if grep -niE "invalid read|invalid write|definitely lost|indirectly lost|uninitialised|uninitialized value|conditional jump|mismatched free" valgrind.log; then
+            echo "valgrind reported the lines above" >&2
+            exit 1
+          fi
+          echo "valgrind found nothing"

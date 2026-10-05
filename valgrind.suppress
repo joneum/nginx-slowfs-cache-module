@@ -1,0 +1,67 @@
+# nginx allocates a few things once at startup and lets the process exit
+# take them back, so valgrind calls them lost.  None of this comes from
+# this module; every entry below was read off a trace that ends in
+# nginx's own code.
+
+{
+   nginx keeps the environment array until the process ends
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_set_environment
+   ...
+}
+
+{
+   nginx keeps the connection and event arrays until the process ends
+   Memcheck:Leak
+   match-leak-kinds: definite,indirect
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_event_process_init
+   ...
+}
+
+{
+   the same arrays, reached through the master process
+   Memcheck:Leak
+   match-leak-kinds: definite,indirect
+   fun:malloc
+   fun:ngx_alloc
+   fun:ngx_event_process_init
+   fun:ngx_worker_process_init
+   ...
+}
+
+{
+   nginx reads one word past the end of a cycle name on purpose
+   Memcheck:Addr1
+   fun:ngx_init_cycle
+   ...
+}
+
+{
+   the same, four bytes at a time
+   Memcheck:Addr4
+   fun:ngx_init_cycle
+   ...
+}
+
+{
+   ngx_sock_ntop formats an address that is only partly filled in
+   Memcheck:Cond
+   fun:ngx_vslprintf
+   fun:ngx_snprintf
+   fun:ngx_sock_ntop
+   ...
+}
+
+{
+   the same, on the byte level
+   Memcheck:Addr1
+   fun:ngx_vslprintf
+   fun:ngx_snprintf
+   fun:ngx_sock_ntop
+   ...
+}
