@@ -12,11 +12,6 @@ for files stored on slow filesystems, for example:
 on the same speed disk(s) as origin.**
 
 
-Sponsors
-========
-`ngx_slowfs_cache` was fully funded by [c2hosting.com](http://c2hosting.com).
-
-
 Status
 ======
 In use again.  The module builds against nginx 1.22.0, 1.24.0, 1.26.3,
@@ -37,9 +32,6 @@ from CentOS, both in 2015 against nginx 1.8.0.
 
 The old list of releases this section used to carry, 0.7 through 1.3,
 described a state of affairs that ended more than ten years ago.
-
-What is open at the repository this one was forked from, and where this
-fork stands on each of it, is in [UPSTREAM.md](UPSTREAM.md).
 
 
 Configuration notes
@@ -162,41 +154,22 @@ Sample configuration
        }
     }
 
-Testing
-=======
-`ngx_slowfs_cache` comes with complete test suite based on [Test::Nginx](http://github.com/agentzh/test-nginx).
+Test Suite
+==========
+The suite is written against
+[Test::Nginx](https://metacpan.org/pod/Test::Nginx):
 
-You can test it by running:
+```
+ci/build.sh 1.31.6 /tmp/nginx-test
+TEST_NGINX_BINARY=/tmp/nginx-test/sbin/nginx prove -r t/
+```
 
-`$ prove`
-
-
-Authors
-=======
-FRiCKLE &lt;info@frickle.com&gt; and Piotr Sikora
-&lt;piotr.sikora@frickle.com&gt; wrote the module, with code taken from
-nginx itself by Igor Sysoev &lt;igor@sysoev.ru&gt;.
-
-This repository is maintained by Jochen Neumeister
-&lt;joneum@FreeBSD.org&gt;, who also maintains the nginx ports in
-FreeBSD.
+`ci/smoke.sh` starts an nginx with a cache configured and fetches a
+file through it, which is the thing the module did not survive for
+ten years.
 
 
 License
 =======
-Copyright (c) 2009-2012, FRiCKLE &lt;info@frickle.com&gt;.
+BSD 2-Clause, see [LICENSE](LICENSE).
 
-Copyright (c) 2009-2012, Piotr Sikora &lt;piotr.sikora@frickle.com&gt;.
-
-Copyright (c) 2002-2011, Igor Sysoev &lt;igor@sysoev.ru&gt;.
-
-Copyright (c) 2026, Jochen Neumeister &lt;joneum@FreeBSD.org&gt;.
-
-Licensed under the BSD 2-Clause License.  The full text, with all four
-lines, is in [LICENSE](LICENSE); it used to be copied out here as well,
-and the copy had drifted from it.
-
-
-See also
-========
-- [ngx_cache_purge](http://github.com/FRiCKLE/ngx_cache_purge).
