@@ -23,9 +23,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 1.22.0 is the oldest release the README promises, 1.31.5 the
-        # current mainline
-        nginx: ['1.22.0', '1.24.0', '1.26.3', '1.28.0', '1.31.5']
+        # 1.22.0 is the oldest release the README promises, 1.30.5 the
+        # current stable and 1.31.6 the current mainline
+        nginx: ['1.22.0', '1.24.0', '1.26.3', '1.28.0', '1.30.5', '1.31.6']
 
     steps:
       - uses: actions/checkout@v7
@@ -67,7 +67,7 @@ jobs:
           echo "PERL5LIB=$HOME/perl5/lib/perl5" >> "$GITHUB_ENV"
 
       - name: Build nginx
-        run: ci/build.sh 1.31.5 "$HOME/nginx"
+        run: ci/build.sh 1.31.6 "$HOME/nginx"
 
       - name: Run the test suite
         run: TEST_NGINX_BINARY="$HOME/nginx/sbin/nginx" prove -r t/
@@ -86,7 +86,7 @@ jobs:
             libpcre2-dev zlib1g-dev libssl-dev
 
       - name: Build the module as a loadable object
-        run: ci/build.sh 1.31.5 "$HOME/nginx" dynamic
+        run: ci/build.sh 1.31.6 "$HOME/nginx" dynamic
 
       - name: Load it and serve a file through the cache
         run: |
@@ -103,13 +103,13 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Build and run the suite in a FreeBSD virtual machine
-        uses: vmactions/freebsd-vm@v1.5.6
+        uses: vmactions/freebsd-vm@v1.5.9
         with:
           release: '14'
           prepare: |
             pkg install -y git pcre2 curl p5-Test-Nginx
           run: |
-            ci/build.sh 1.31.5 "$HOME/nginx"
+            ci/build.sh 1.31.6 "$HOME/nginx"
             ci/smoke.sh "$HOME/nginx/sbin/nginx"
             # the job runs as root, and Test::Nginx then writes "user
             # root;" into its configuration.  root has no group of that
@@ -144,7 +144,7 @@ jobs:
           echo "PERL5LIB=$HOME/perl5/lib/perl5" >> "$GITHUB_ENV"
 
       - name: Build nginx
-        run: ci/build.sh 1.31.5 "$HOME/nginx"
+        run: ci/build.sh 1.31.6 "$HOME/nginx"
 
       - name: Run the test suite under valgrind
         run: |

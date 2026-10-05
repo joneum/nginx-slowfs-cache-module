@@ -20,9 +20,10 @@ Sponsors
 Status
 ======
 In use again.  The module builds against nginx 1.22.0, 1.24.0, 1.26.3,
-1.28.0 and 1.31.5, and on each of them a configuration that carries
-`slowfs_cache_path` is read, nginx starts and a file comes back through
-the cache.  That is checked on Linux and on FreeBSD in [continuous
+1.28.0, 1.30.5 and 1.31.6, and on each of them a configuration that
+carries `slowfs_cache_path` is read, nginx starts and a file comes back
+through the cache.  That is checked on Linux and on FreeBSD in
+[continuous
 integration](https://github.com/joneum/nginx-slowfs-cache-module/actions).
 
 Between roughly nginx 1.7.12 and this fork the module could not be used
