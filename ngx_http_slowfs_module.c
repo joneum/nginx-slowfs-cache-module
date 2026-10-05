@@ -76,6 +76,19 @@ typedef struct {
     ngx_uint_t                 cache_status;
 } ngx_http_slowfs_ctx_t;
 
+/*
+ * ngx_http_file_cache_set_slot() appends the cache it has just built to
+ * an ngx_array_t that it reaches through the module's configuration and
+ * the offset in the command entry.  nginx has worked that way since the
+ * per-module cache arrays arrived; before that it kept one global list,
+ * which is what this module was written against.
+ */
+typedef struct {
+    ngx_array_t                caches;  /* ngx_http_file_cache_t * */
+} ngx_http_slowfs_main_conf_t;
+
+static void *ngx_http_slowfs_create_main_conf(ngx_conf_t *cf);
+
 ngx_module_t  ngx_http_slowfs_module;
 
 static ngx_path_init_t  ngx_http_slowfs_temp_path = {
@@ -108,8 +121,8 @@ static ngx_command_t  ngx_http_slowfs_module_commands[] = {
     { ngx_string("slowfs_cache_path"),
       NGX_HTTP_MAIN_CONF|NGX_CONF_2MORE,
       ngx_http_file_cache_set_slot,
-      0,
-      0,
+      NGX_HTTP_MAIN_CONF_OFFSET,
+      offsetof(ngx_http_slowfs_main_conf_t, caches),
       &ngx_http_slowfs_module },
 
     { ngx_string("slowfs_cache_min_uses"),
@@ -156,7 +169,7 @@ static ngx_http_module_t  ngx_http_slowfs_module_ctx = {
     ngx_http_slowfs_add_variables,    /* preconfiguration */
     ngx_http_slowfs_init,             /* postconfiguration */
 
-    NULL,                             /* create main configuration */
+    ngx_http_slowfs_create_main_conf, /* create main configuration */
     NULL,                             /* init main configuration */
 
     NULL,                             /* create server configuration */
@@ -1071,6 +1084,26 @@ ngx_http_slowfs_cache_purge_conf(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     clcf->handler = ngx_http_slowfs_cache_purge_handler;
 
     return NGX_CONF_OK;
+}
+
+static void *
+ngx_http_slowfs_create_main_conf(ngx_conf_t *cf)
+{
+    ngx_http_slowfs_main_conf_t  *slowmcf;
+
+    slowmcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_slowfs_main_conf_t));
+    if (slowmcf == NULL) {
+        return NULL;
+    }
+
+    if (ngx_array_init(&slowmcf->caches, cf->pool, 4,
+                       sizeof(ngx_http_file_cache_t *))
+        != NGX_OK)
+    {
+        return NULL;
+    }
+
+    return slowmcf;
 }
 
 void *
