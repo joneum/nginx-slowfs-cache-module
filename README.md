@@ -19,16 +19,23 @@ Sponsors
 
 Status
 ======
-This module is production-ready and it's compatible with following nginx
-releases:
+In use again.  The module builds against nginx 1.22.0, 1.24.0, 1.26.3,
+1.28.0 and 1.31.5, and on each of them a configuration that carries
+`slowfs_cache_path` is read, nginx starts and a file comes back through
+the cache.  That is checked on Linux and on FreeBSD in [continuous
+integration](https://github.com/joneum/nginx-slowfs-cache-module/actions).
 
-- 0.7.x (tested with 0.7.60 to 0.7.69),
-- 0.8.x (tested with 0.8.0 to 0.8.55),
-- 0.9.x (tested with 0.9.0 to 0.9.7),
-- 1.0.x (tested with 1.0.0 to 1.0.15),
-- 1.1.x (tested with 1.1.0 to 1.1.19),
-- 1.2.x (tested with 1.2.0 to 1.2.7),
-- 1.3.x (tested with 1.3.0 to 1.3.14).
+Between roughly nginx 1.7.12 and this fork the module could not be used
+at all: `slowfs_cache_path` handed `ngx_http_file_cache_set_slot()` a
+null configuration, because nginx had moved from one global list of
+caches to a per-module array, and nginx died while reading the
+configuration.  Two reports of exactly that went unanswered upstream,
+[#11](https://github.com/FRiCKLE/ngx_slowfs_cache/issues/11) from
+FreeBSD and [#12](https://github.com/FRiCKLE/ngx_slowfs_cache/issues/12)
+from CentOS, both in 2015 against nginx 1.8.0.
+
+The old list of releases this section used to carry, 0.7 through 1.3,
+described a state of affairs that ended more than ten years ago.
 
 
 Configuration notes

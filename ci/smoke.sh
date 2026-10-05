@@ -107,8 +107,12 @@ for n in 1 2 3; do
 done
 
 echo "--- something reached the cache ---"
-if [ -n "$(find "$WORK/cache" -type f ! -path '*/tmp/*' 2>/dev/null)" ]; then
-	find "$WORK/cache" -type f ! -path '*/tmp/*' | sed 's/^/  /'
+# the temporary directory sits inside the cache directory, so leave it
+# out by its full path; a pattern like */tmp/* would also match every
+# work tree that happens to live under /tmp
+cached=$(find "$WORK/cache" -type f ! -path "$WORK/cache/tmp/*" 2>/dev/null)
+if [ -n "$cached" ]; then
+	echo "$cached" | sed 's/^/  /'
 else
 	echo "  nothing was written" >&2
 	fail=1
