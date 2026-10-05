@@ -171,36 +171,30 @@ You can test it by running:
 `$ prove`
 
 
+Authors
+=======
+FRiCKLE &lt;info@frickle.com&gt; and Piotr Sikora
+&lt;piotr.sikora@frickle.com&gt; wrote the module, with code taken from
+nginx itself by Igor Sysoev &lt;igor@sysoev.ru&gt;.
+
+This repository is maintained by Jochen Neumeister
+&lt;joneum@FreeBSD.org&gt;, who also maintains the nginx ports in
+FreeBSD.
+
+
 License
 =======
-    Copyright (c) 2009-2012, FRiCKLE <info@frickle.com>
-    Copyright (c) 2009-2012, Piotr Sikora <piotr.sikora@frickle.com>
-    Copyrithg (c) 2002-2012, Igor Sysoev <igor@sysoev.ru>
-    All rights reserved.
+Copyright (c) 2009-2012, FRiCKLE &lt;info@frickle.com&gt;.
 
-    This project was fully funded by c2hosting.com.
-    Included cache_purge functionality was fully funded by yo.se.
+Copyright (c) 2009-2012, Piotr Sikora &lt;piotr.sikora@frickle.com&gt;.
 
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions
-    are met:
-    1. Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright
-       notice, this list of conditions and the following disclaimer in the
-       documentation and/or other materials provided with the distribution.
+Copyright (c) 2002-2011, Igor Sysoev &lt;igor@sysoev.ru&gt;.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-    HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Copyright (c) 2026, Jochen Neumeister &lt;joneum@FreeBSD.org&gt;.
+
+Licensed under the BSD 2-Clause License.  The full text, with all four
+lines, is in [LICENSE](LICENSE); it used to be copied out here as well,
+and the copy had drifted from it.
 
 
 See also
