@@ -30,10 +30,8 @@ for files stored on slow filesystems, for example:
 - storage: network disks, cache: local disks,
 - storage: 7,2K SATA drives, cache: 15K SAS drives in RAID0.
 
-
 **WARNING! There is no point in using this module when cache is placed
 on the same speed disk(s) as origin.**
-
 
 Status
 ======
@@ -41,8 +39,7 @@ In use again.  The module builds against nginx 1.22.0, 1.24.0, 1.26.3,
 1.28.0, 1.30.5 and 1.31.6, and on each of them a configuration that
 carries `slowfs_cache_path` is read, nginx starts and a file comes back
 through the cache with its ETag on it.  That is checked on Linux and on
-FreeBSD in [continuous
-integration](https://github.com/joneum/nginx-slowfs-cache-module/actions).
+FreeBSD.
 
 Between roughly nginx 1.7.12 and this fork the module could not be used
 at all: `slowfs_cache_path` handed `ngx_http_file_cache_set_slot()` a
@@ -52,10 +49,6 @@ configuration.  Two reports of exactly that went unanswered upstream,
 [#11](https://github.com/FRiCKLE/ngx_slowfs_cache/issues/11) from
 FreeBSD and [#12](https://github.com/FRiCKLE/ngx_slowfs_cache/issues/12)
 from CentOS, both in 2015 against nginx 1.8.0.
-
-The old list of releases this section used to carry, 0.7 through 1.3,
-described a state of affairs that ended more than ten years ago.
-
 
 Configuration notes
 ===================
@@ -69,7 +62,6 @@ else on the machine; a stray file named `1` in `/tmp` was enough to
 make every copy into the cache fail.
 
 `ngx_slowfs_cache` currently doesn't work when AIO is enabled.
-
 
 Configuration directives
 ========================
@@ -90,7 +82,6 @@ slowfs_cache_key
 
 Sets key for caching.
 
-
 slowfs_cache_purge
 ------------------
 * **syntax**: `slowfs_cache_purge zone_name key`
@@ -98,7 +89,6 @@ slowfs_cache_purge
 * **context**: `location`
 
 Sets area and key used for purging selected pages from cache.
-
 
 slowfs_cache_path
 -----------------
@@ -108,7 +98,6 @@ slowfs_cache_path
 
 Sets cache area and its structure.
 
-
 slowfs_temp_path
 ----------------
 * **syntax**: `slowfs_temp_path path [level1] [level2] [level3]`
@@ -116,7 +105,6 @@ slowfs_temp_path
 * **context**: `http`
   
 Sets temporary area where files are stored before they are moved to cache area.
-
 
 slowfs_cache_min_uses
 ---------------------
@@ -126,7 +114,6 @@ slowfs_cache_min_uses
 
 Sets number of uses after which file is copied to cache.
 
-
 slowfs_cache_valid
 ------------------
 * **syntax**: `slowfs_cache_valid [reply_code] time`
@@ -134,7 +121,6 @@ slowfs_cache_valid
 * **context**: `http`, `server`, `location`
 
 Sets time for which file will be served from cache.
-
 
 slowfs_big_file_size
 --------------------
@@ -145,7 +131,6 @@ slowfs_big_file_size
 Sets minimum file size for `big` files. Worker processes `fork()` child process
 before they start copying `big` files to avoid any service disruption. 
 
-
 Configuration variables
 =======================
 $slowfs_cache_status
@@ -153,7 +138,6 @@ $slowfs_cache_status
 Represents availability of cached file.
 
 Possible values are: `MISS`, `HIT` and `EXPIRED`.
-
 
 Sample configuration
 ====================
@@ -190,7 +174,6 @@ TEST_NGINX_BINARY=/tmp/nginx-test/sbin/nginx prove -r t/
 `ci/smoke.sh` starts an nginx with a cache configured and fetches a
 file through it, which is the thing the module did not survive for
 ten years.
-
 
 License
 =======
