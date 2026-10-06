@@ -60,9 +60,19 @@ cd "$WORK/nginx-$NGINX"
 # has to be in the build: --with-http_ssl_module brings the proxy module
 # along, and with it NGX_HTTP_CACHE
 
+# the sanitizer workflow builds through this script as well, so that
+# there is one build path and not two that drift apart
+set --
+if [ -n "${CI_CC_OPT:-}" ]; then
+	set -- "$@" --with-cc-opt="$CI_CC_OPT"
+fi
+if [ -n "${CI_LD_OPT:-}" ]; then
+	set -- "$@" --with-ld-opt="$CI_LD_OPT"
+fi
+
 echo "--- configure ($MODE) ---"
 ./configure --prefix="$PREFIX" --with-debug --with-http_ssl_module \
-	"$how=$SRC" > "$WORK/configure-$NGINX.log" 2>&1 ||
+	"$how=$SRC" "$@" > "$WORK/configure-$NGINX.log" 2>&1 ||
 	{ tail -30 "$WORK/configure-$NGINX.log"; exit 1; }
 
 echo "--- make -j$JOBS ---"
