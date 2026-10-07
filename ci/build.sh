@@ -24,19 +24,37 @@ SRC=$(cd "$(dirname "$0")/.." && pwd)
 WORK=${CI_WORK:-$SRC/ci-work}
 JOBS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
 
+# Every version, digest and commit comes from one file, so a run here pins
+# exactly what a continuous integration run pins.  Deliberately not
+# overridable from the environment: a version and the digest that proves it
+# have to move together, and an override would separate them.
+PINS=$SRC/.github/versions.env
+[ -r "$PINS" ] || {
+	echo "ci/build.sh: cannot read $PINS" >&2
+	exit 1
+}
+# shellcheck source=../.github/versions.env
+. "$PINS"
+
 mkdir -p "$WORK"
 
 tarball=$WORK/nginx-$NGINX.tar.gz
 url=https://nginx.org/download/nginx-$NGINX.tar.gz
 
-if [ ! -s "$tarball" ]; then
-	# curl is a package on FreeBSD, fetch is in the base system
-	if command -v curl > /dev/null 2>&1; then
-		curl -sSfL -o "$tarball" "$url"
-	else
-		fetch -q -o "$tarball" "$url"
-	fi
+# The digest is looked up by version, so building another release means
+# writing its pin down first.  A missing pin is refused rather than waved
+# through: a check that skips itself when it has nothing to compare against
+# is not a check, it only looks like one.
+key=NGINX_$(echo "$NGINX" | tr . _)_SHA256
+eval "want=\${$key:-}"
+if [ -z "$want" ]; then
+	echo "ci/build.sh: no sha256 for nginx $NGINX in $PINS" >&2
+	echo "ci/build.sh: harvest one with" >&2
+	echo "    ci/fetch-verify.sh $url - $tarball" >&2
+	exit 1
 fi
+
+"$SRC/ci/fetch-verify.sh" "$url" "$want" "$tarball"
 
 rm -rf "$WORK/nginx-$NGINX"
 tar xzf "$tarball" -C "$WORK"

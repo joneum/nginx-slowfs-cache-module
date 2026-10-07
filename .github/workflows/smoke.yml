@@ -14,8 +14,25 @@ permissions:
   contents: read
 
 jobs:
+  pins:
+    name: pins
+    runs-on: ubuntu-latest
+    # A matrix is read before any step of its own job runs, so the release
+    # list has to arrive from an earlier job.  Which releases, and why,
+    # is written down in .github/versions.env.
+    outputs:
+      nginx: ${{ steps.read.outputs.nginx }}
+      version: ${{ steps.read.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: read
+        run: .github/scripts/pins.sh >> "$GITHUB_OUTPUT"
+
   smoke:
     name: nginx ${{ matrix.nginx }}
+    needs: pins
     runs-on: ubuntu-latest
     # for about ten years a single slowfs_cache_path was enough to kill
     # nginx while it read the configuration, and nothing ever noticed
@@ -24,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        nginx: ['1.22.0', '1.24.0', '1.26.3', '1.28.0', '1.30.5', '1.31.6']
+        nginx: ${{ fromJSON(needs.pins.outputs.nginx) }}
 
     steps:
       - uses: actions/checkout@v7

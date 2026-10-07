@@ -35,8 +35,8 @@ on the same speed disk(s) as origin.**
 
 Status
 ======
-In use again.  The module builds against nginx 1.22.0, 1.24.0, 1.26.3,
-1.28.0, 1.30.5 and 1.31.6, and on each of them a configuration that
+In use again.  The module builds against nginx 1.28.3, 1.30.5 and 1.31.6,
+and on each of them a configuration that
 carries `slowfs_cache_path` is read, nginx starts and a file comes back
 through the cache with its ETag on it.  That is checked on Linux and on
 FreeBSD.
