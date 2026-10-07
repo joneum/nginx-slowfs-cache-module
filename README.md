@@ -5,6 +5,7 @@ About
 [![Smoke][smoke-badge]][smoke-link]
 [![A/UBSan][sanitizers-badge]][sanitizers-link]
 [![Valgrind][valgrind-badge]][valgrind-link]
+[![Reload][reload-badge]][reload-link]
 [![CodeQL][codeql-badge]][codeql-link]
 [![Lint][lint-badge]][lint-link]
 
@@ -18,6 +19,8 @@ About
 [sanitizers-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/sanitizers.yml
 [valgrind-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/valgrind.yml/badge.svg
 [valgrind-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/valgrind.yml
+[reload-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/reload.yml/badge.svg
+[reload-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/reload.yml
 [codeql-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/codeql.yml/badge.svg
 [codeql-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/codeql.yml
 [lint-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/lint.yml/badge.svg
