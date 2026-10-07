@@ -48,6 +48,19 @@ Newest first.  Dates are release dates.
 
 ### Changed
 
+- `valgrind.suppress` carries two entries instead of 7, and both say what
+  they hide.  Measured, not assumed: with an empty file the suite reports
+  exactly two things and nothing else, the environment array nginx keeps in
+  `ngx_set_environment` and the connection and event arrays it keeps in
+  `ngx_event_process_init`.  No invalid read, no uninitialised value, no
+  conditional jump -- so everything beyond those two suppressed something
+  that never happens.  The file is now the same in all four module
+  repositories.
+- Both traces run through `ngx_single_process_cycle`, because Test::Nginx
+  starts nginx with `master_process off`.  An entry for the master's own path
+  could never be reached from this suite, which is why there is none: a
+  suppression nobody can check is worse than no suppression.
+
 - The deep checks -- codeql, lint, sanitizers, valgrind and the FreeBSD run
   -- now build 1.30.5, the release `www/nginx`, `www/nginx-full` and
   `www/nginx-lite` ship, instead of mainline.  They used to look at a version

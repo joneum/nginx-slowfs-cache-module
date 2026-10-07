@@ -1,7 +1,20 @@
-# nginx allocates a few things once at startup and lets the process exit
-# take them back, so valgrind calls them lost.  None of this comes from
-# this module; every entry below was read off a trace that ends in
-# nginx's own code.
+# nginx allocates two things once and lets the process exit take them back,
+# so valgrind calls them lost.  Neither comes from this module: both traces
+# end in nginx's own code, and the module does not appear in either.
+#
+# These two are the only entries, and that is measured, not assumed.  With
+# an empty file the suite reports exactly these and nothing else -- no
+# invalid read, no uninitialised value, no conditional jump.  Anything that
+# was in here beyond them suppressed something that never happens.
+#
+# Note which cycle function they come through: Test::Nginx runs nginx with
+# master_process off, so everything here is the single-process path.  An
+# entry for the master's own path would never be reached from this suite
+# and so would be an entry nobody can check.
+#
+# If a later nginx brings a finding back, valgrind will say so with a full
+# trace.  Add it then, with a name and a reason, rather than keeping one
+# here on the chance that it is still needed.
 
 {
    nginx keeps the environment array until the process ends
@@ -20,48 +33,5 @@
    fun:malloc
    fun:ngx_alloc
    fun:ngx_event_process_init
-   ...
-}
-
-{
-   the same arrays, reached through the master process
-   Memcheck:Leak
-   match-leak-kinds: definite,indirect
-   fun:malloc
-   fun:ngx_alloc
-   fun:ngx_event_process_init
-   fun:ngx_worker_process_init
-   ...
-}
-
-{
-   nginx reads one word past the end of a cycle name on purpose
-   Memcheck:Addr1
-   fun:ngx_init_cycle
-   ...
-}
-
-{
-   the same, four bytes at a time
-   Memcheck:Addr4
-   fun:ngx_init_cycle
-   ...
-}
-
-{
-   ngx_sock_ntop formats an address that is only partly filled in
-   Memcheck:Cond
-   fun:ngx_vslprintf
-   fun:ngx_snprintf
-   fun:ngx_sock_ntop
-   ...
-}
-
-{
-   the same, on the byte level
-   Memcheck:Addr1
-   fun:ngx_vslprintf
-   fun:ngx_snprintf
-   fun:ngx_sock_ntop
    ...
 }
