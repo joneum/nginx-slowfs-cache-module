@@ -14,6 +14,14 @@ Newest first.  Dates are release dates.
   so the next run cannot pick it up, and a file that is already present is
   hashed again rather than trusted.
 
+### Fixed
+
+- `ci/ubsan.suppress` names the one finding nginx's own startup produces on
+  1.30.5: `ngx_pstrdup` copies a zero-length string from a null pointer while
+  `ngx_init_cycle` sets up the prefixes, before a single module is loaded.
+  The entry carries the full stack and the reason, and it comes out again as
+  soon as the shipped stable line no longer carries it.  1.31.6 does not.
+
 ### Changed
 
 - The deep checks -- codeql, lint, sanitizers, valgrind and the FreeBSD run
