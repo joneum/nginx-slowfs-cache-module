@@ -17,6 +17,7 @@ jobs:
   pins:
     name: pins
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # A matrix is read before any step of its own job runs, so the release
     # list has to arrive from an earlier job.  Which releases, and why,
     # is written down in .github/versions.env.
@@ -34,6 +35,7 @@ jobs:
     name: nginx ${{ matrix.nginx }}
     needs: pins
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # for about ten years a single slowfs_cache_path was enough to kill
     # nginx while it read the configuration, and nothing ever noticed
     # because nothing ever built the module and started it.
