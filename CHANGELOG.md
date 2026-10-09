@@ -12,6 +12,34 @@ Newest first.  Dates are release dates.
 
 ### Added
 
+- A hostile-client test: `ci/hostile.sh` and a workflow of its own.  The
+  rest here drives one request at a time -- `t/small_file.t`,
+  `t/big_file.t` and `ci/smoke.sh` all fetch, compare, fetch again -- and
+  the more interesting half of this module cannot be reached that way.  For
+  a file of at least `slowfs_big_file_size`, 131072 by default, it does not
+  copy into the cache in the worker at all: it forks a child, renames it in
+  the process table, lets the child write the entry, and serves the client
+  from the source meanwhile.  A fork per request is where concurrency and
+  aborts hurt.
+- Five cases, all above that threshold so every one takes the forking path:
+  one client as a reference, ten clients at once on an entry that does not
+  exist yet, a client that walks away while its child is still copying, a
+  range request on a file that comes from the cache, and a source file that
+  is deleted after it was cached.  The oracles are the full file byte for
+  byte, exactly one cache entry after the ten -- not ten -- and no child
+  process left behind afterwards.
+- The range case is the one nothing else asked for.  `r->allow_ranges` is
+  set on the cache path as well as on the source path, and until now only
+  the source path was ever asked for a range.
+- A cache entry outlives its source: within `slowfs_cache_valid` the answer
+  comes from the entry and the source is not touched.  That is what a cache
+  is for, and now it is written down.
+- Proven against a planted defect, and the control is specific.  With
+  `r->allow_ranges = 0` on the cache path only -- one line in
+  `ngx_http_slowfs_cache_send` -- `ci/smoke.sh` stays green at exit 0 while
+  `ci/hostile.sh` fails on exactly that case with "HTTP 200, expected 206".
+  So the new check measures something the old ones do not.
+
 - A reload test: `ci/reload.sh`, the per-module `ci/reload.conf` beside it,
   and a workflow of its own.  nginx is reloaded eight times in a row and
   after every one of them the module has to answer correctly, the worker

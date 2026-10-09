@@ -1,0 +1,40 @@
+name: Hostile
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Monday morning, so a new nginx release that breaks the module shows
+    # up here and not in somebody's build
+    - cron: '59 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hostile:
+    name: clients that arrive together
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # For a file of at least slowfs_big_file_size the module forks a child
+    # to write the cache entry and serves the client from the source
+    # meanwhile.  A suite that drives one request at a time never has two
+    # of those children on the same entry, and never loses the client while
+    # one is still copying.
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup
+        with:
+          test-nginx: 'false'
+
+      - name: Build nginx
+        run: |
+          . .github/versions.env
+          ci/build.sh "$NGINX_VERSION" "$HOME/nginx"
+
+      - name: Ten at once, one that walks away, one that wants a range
+        run: ci/hostile.sh "$HOME/nginx/sbin/nginx"

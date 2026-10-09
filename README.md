@@ -3,6 +3,7 @@ About
 [![Build & Test][build-test-badge]][build-test-link]
 [![FreeBSD][freebsd-badge]][freebsd-link]
 [![Smoke][smoke-badge]][smoke-link]
+[![Hostile][hostile-badge]][hostile-link]
 [![A/UBSan][sanitizers-badge]][sanitizers-link]
 [![Valgrind][valgrind-badge]][valgrind-link]
 [![Reload][reload-badge]][reload-link]
@@ -15,6 +16,8 @@ About
 [freebsd-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/freebsd.yml
 [smoke-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/smoke.yml/badge.svg
 [smoke-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/smoke.yml
+[hostile-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/hostile.yml/badge.svg
+[hostile-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/hostile.yml
 [sanitizers-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/sanitizers.yml/badge.svg
 [sanitizers-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/sanitizers.yml
 [valgrind-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/valgrind.yml/badge.svg
