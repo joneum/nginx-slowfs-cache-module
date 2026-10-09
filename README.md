@@ -9,22 +9,22 @@ About
 [![CodeQL][codeql-badge]][codeql-link]
 [![Lint][lint-badge]][lint-link]
 
-[build-test-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/build-test.yml/badge.svg
-[build-test-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/build-test.yml
-[freebsd-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/freebsd.yml/badge.svg
-[freebsd-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/freebsd.yml
-[smoke-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/smoke.yml/badge.svg
-[smoke-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/smoke.yml
-[sanitizers-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/sanitizers.yml/badge.svg
-[sanitizers-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/sanitizers.yml
-[valgrind-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/valgrind.yml/badge.svg
-[valgrind-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/valgrind.yml
-[reload-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/reload.yml/badge.svg
-[reload-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/reload.yml
-[codeql-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/codeql.yml/badge.svg
-[codeql-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/codeql.yml
-[lint-badge]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/lint.yml/badge.svg
-[lint-link]: https://github.com/joneum/nginx-slowfs-cache-module/actions/workflows/lint.yml
+[build-test-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/build-test.yml/badge.svg
+[build-test-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/build-test.yml
+[freebsd-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/freebsd.yml/badge.svg
+[freebsd-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/freebsd.yml
+[smoke-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/smoke.yml/badge.svg
+[smoke-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/smoke.yml
+[sanitizers-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/sanitizers.yml/badge.svg
+[sanitizers-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/sanitizers.yml
+[valgrind-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/valgrind.yml/badge.svg
+[valgrind-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/valgrind.yml
+[reload-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/reload.yml/badge.svg
+[reload-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/reload.yml
+[codeql-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/codeql.yml/badge.svg
+[codeql-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/codeql.yml
+[lint-badge]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/lint.yml/badge.svg
+[lint-link]: https://github.com/sysadmin-labs/nginx-slowfs-cache-module/actions/workflows/lint.yml
 
 `ngx_slowfs_cache` is `nginx` module which allows caching of static files
 (served using `root` directive). This enables one to create fast caches
